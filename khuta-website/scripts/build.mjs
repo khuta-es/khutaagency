@@ -38,3 +38,14 @@ if (missing.length) {
 let n = 0, bytes = 0;
 (function walk(d) { for (const f of readdirSync(d)) { const p = join(d, f); statSync(p).isDirectory() ? walk(p) : (n++, bytes += statSync(p).size); } })(dist);
 console.log(`Build OK: ${n} files, ${(bytes / 1024).toFixed(0)} KB -> dist/`);
+
+// Cache busting: stamp a content hash on css/js links in dist/index.html (and warn if the source is stale)
+import { createHash } from 'node:crypto';
+const ver = createHash('sha1').update(['css/styles.css', 'js/blog.js', 'js/app.js'].map(f => readFileSync(join(root, f))).join('')).digest('hex').slice(0, 8);
+const stamp = s => s.replace(/(css\/styles\.css|js\/blog\.js|js\/app\.js)(\?v=[a-f0-9]+)?"/g, `$1?v=${ver}"`);
+import { writeFileSync } from 'node:fs';
+writeFileSync(join(dist, 'index.html'), stamp(readFileSync(join(dist, 'index.html'), 'utf8')));
+if (!readFileSync(join(root, 'index.html'), 'utf8').includes(`?v=${ver}"`)) {
+  writeFileSync(join(root, 'index.html'), stamp(readFileSync(join(root, 'index.html'), 'utf8')));
+  console.log(`index.html asset version updated to ${ver} (commit it)`);
+}
