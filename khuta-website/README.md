@@ -80,3 +80,12 @@ vercel.json             إعدادات Vercel (Headers وCache)
 ## ربط النموذج بخدمة حقيقية (اختياري لاحقاً)
 
 في `js/app.js` ابحث عن `TODO: also POST the form`. أنشئ Serverless Function في `/api/contact.js`، وضع المفاتيح في **Vercel → Settings → Environment Variables** (انظر `.env.example`)، ولا تضع أي مفتاح سري داخل ملفات الواجهة.
+
+## النشر على Hostinger
+
+1. شغّل `npm run build` (أو استخدم ملف dist الجاهز).
+2. في hPanel افتح **Files → File Manager** وادخل إلى `public_html`.
+3. ارفع **محتويات** مجلد `dist` (وليس المجلد نفسه) بما فيها الملف المخفي `.htaccess`، أو ارفعها مضغوطة ثم **Extract** داخل `public_html`.
+4. يجب أن يكون `index.html` مباشرة داخل `public_html`.
+
+ملف `.htaccess` يطبّق على Apache نفس الـ Headers والكاش الموجودة في `vercel.json`.
